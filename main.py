@@ -47,12 +47,13 @@ def main():
     text_color = "DarkGoldenrod1"
     mainlinetxt = "───➕───"
 
-    def on_click(event):
+    def on_click(event=None):
         input_text.place(x=150 + offsetx, y=150 + offsety, anchor="center")
         input_text.focus_set()
 
     def add_new_task(event=None, task=None):
         global next_y_position
+        global taskboxdict
 
         if not task:
             task_text = input_text.get("1.0", "end-1c").strip()
@@ -70,7 +71,7 @@ def main():
             # Add the task text itself
             task_text_id = canvas.create_text(75 + offsetx, next_y_position + offsety, text=task_text, font=small_font, fill=text_color,
                                               width=200, anchor="nw")
-
+            taskboxdict[task_text_id] = box_id
             # Store both box and text in the tasks list as a tuple
             tasks.append((box_id, task_text_id))
 
@@ -179,9 +180,10 @@ def main():
     # root.bind("<Control-Shift-L><C>", lambda _: complete_task(*tasks[0]) if tasks else None)
     # root.bind("<Control-Shift-L><K>", lambda _: root.destroy())
 
+    global taskboxdict
     keyboard.add_hotkey('ctrl + shift + l + k', root.destroy, args=())
-    keyboard.add_hotkey('ctrl + shift + l + h', toggle_visibility, args=())
-    keyboard.add_hotkey('ctrl + shift + l + c', complete_task, args=(tasks[0] if tasks else None))
+    keyboard.add_hotkey('ctrl + shift + l + comma', toggle_visibility, args=())
+    keyboard.add_hotkey('ctrl + shift + l + c', lambda: complete_task(*tasks[0]) if tasks else None, args=())
     keyboard.add_hotkey('ctrl + shift + l + n', on_click, args=())
 
     mainline_textid = canvas.create_text(150 + offsetx, 100 + offsety, text=mainlinetxt, font=bold_font, fill=text_color)
@@ -208,6 +210,7 @@ if __name__ == "__main__":
     next_y_position = 140
     transparent_color = "white"
     current_color_index_map = {}
+    taskboxdict = {}
     hovering_map = {}
     tasks = []  # List to hold tasks as tuples of (box_id, task_text_id)
     main()
