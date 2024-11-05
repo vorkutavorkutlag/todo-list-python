@@ -1,8 +1,12 @@
 import tkinter as tk
-import tkinter.font
+import keyboard
 from sys import argv
+
 from variable_functions import *
 
+# Global offset variables
+offsetx = 0
+offsety = 0
 
 def initialize_root(root):
     root.geometry("+1650+55")
@@ -12,9 +16,8 @@ def initialize_root(root):
     root.configure(bg=transparent_color)
     root.wm_attributes("-transparentcolor", transparent_color)
 
-
 def main():
-    root: tk.Tk = tkinter.Tk()
+    root: tk.Tk = tk.Tk()
     init_config()
     initialize_root(root)
     canvas = tk.Canvas(root, width=1920, height=1080, bg=transparent_color, highlightthickness=0)
@@ -45,7 +48,7 @@ def main():
     mainlinetxt = "───➕───"
 
     def on_click(event):
-        input_text.place(x=150, y=150, anchor="center")
+        input_text.place(x=150 + offsetx, y=150 + offsety, anchor="center")
         input_text.focus_set()
 
     def add_new_task(event=None, task=None):
@@ -53,19 +56,19 @@ def main():
 
         if not task:
             task_text = input_text.get("1.0", "end-1c").strip()
-            save_task(task_text)
+            save_task(task_text) if task_text else ()
         else:
             task_text = task
 
         if task_text:
             # Add the clickable box with the exclamation mark
-            box_id = canvas.create_text(50, next_y_position+15, text="【!】 ", font=small_font, fill="orange", anchor="w")
+            box_id = canvas.create_text(50 + offsetx, next_y_position + 15 + offsety, text="【!】 ", font=small_font, fill="orange", anchor="w")
             current_color_index_map[box_id] = 0
             canvas.tag_bind(box_id, "<Enter>", lambda _: on_enter(box_id))
             canvas.tag_bind(box_id, "<Leave>", lambda _: on_leave(box_id))
 
             # Add the task text itself
-            task_text_id = canvas.create_text(75, next_y_position, text=task_text, font=small_font, fill=text_color,
+            task_text_id = canvas.create_text(75 + offsetx, next_y_position + offsety, text=task_text, font=small_font, fill=text_color,
                                               width=200, anchor="nw")
 
             # Store both box and text in the tasks list as a tuple
@@ -129,8 +132,8 @@ def main():
         global next_y_position
         next_y_position = 140  # Reset starting y-position
         for box_id, task_text_id in tasks:
-            canvas.coords(box_id, 50, next_y_position+15)
-            canvas.coords(task_text_id, 75, next_y_position)
+            canvas.coords(box_id, 50 + offsetx, next_y_position + 15 + offsety)
+            canvas.coords(task_text_id, 75 + offsetx, next_y_position + offsety)
             next_y_position += int(canvas.bbox(task_text_id)[3] - canvas.bbox(task_text_id)[1]) + 20
 
     def flash_widget(widget_id, times, on_complete=None):
@@ -160,7 +163,28 @@ def main():
             current_color_index_map[text_id] = (current_color_index_map[text_id] + 1) % 4
             root.after(100, lambda: cycle_colors(text_id))
 
-    mainline_textid = canvas.create_text(150, 100, text=mainlinetxt, font=bold_font, fill=text_color)
+    # Define shortcuts
+
+
+    def toggle_visibility():
+        if root.attributes("-alpha") == 1.0:
+            root.attributes("-alpha", 0.0)
+        else:
+            root.attributes("-alpha", 1.0)
+
+    canvas.focus_force()
+    # Following works only if app is focused
+    # root.bind("<Control-Shift-L><N>", lambda _: on_click(None))
+    # root.bind("<Control-Shift-L><H>", lambda _: toggle_visibility())
+    # root.bind("<Control-Shift-L><C>", lambda _: complete_task(*tasks[0]) if tasks else None)
+    # root.bind("<Control-Shift-L><K>", lambda _: root.destroy())
+
+    keyboard.add_hotkey('ctrl + shift + l + k', root.destroy, args=())
+    keyboard.add_hotkey('ctrl + shift + l + h', toggle_visibility, args=())
+    keyboard.add_hotkey('ctrl + shift + l + c', complete_task, args=(tasks[0] if tasks else None))
+    keyboard.add_hotkey('ctrl + shift + l + n', on_click, args=())
+
+    mainline_textid = canvas.create_text(150 + offsetx, 100 + offsety, text=mainlinetxt, font=bold_font, fill=text_color)
     current_color_index_map[mainline_textid] = 0
     hovering_map[mainline_textid] = False
 
