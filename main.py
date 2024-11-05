@@ -57,7 +57,7 @@ def main():
 
         if not task:
             task_text = input_text.get("1.0", "end-1c").strip()
-            save_task(task_text) if task_text else ()
+            save_task(task_text) if task_text else None
         else:
             task_text = task
 
@@ -184,7 +184,7 @@ def main():
     keyboard.add_hotkey('ctrl + shift + l + k', root.destroy, args=())
     keyboard.add_hotkey('ctrl + shift + l + comma', toggle_visibility, args=())
     keyboard.add_hotkey('ctrl + shift + l + c', lambda: complete_task(*tasks[0]) if tasks else None, args=())
-    keyboard.add_hotkey('ctrl + shift + l + n', on_click, args=())
+    keyboard.add_hotkey('ctrl + shift + l + semicolon', on_click, args=())
 
     mainline_textid = canvas.create_text(150 + offsetx, 100 + offsety, text=mainlinetxt, font=bold_font, fill=text_color)
     current_color_index_map[mainline_textid] = 0
