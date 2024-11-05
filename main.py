@@ -1,7 +1,21 @@
 import tkinter as tk
 import tkinter.font
+import getpass
+import os
 from sys import argv
 from variable_functions import *
+
+
+def add_to_startup(file_path=""):
+    try:
+        if file_path == "":
+            file_path = os.path.abspath(__file__)
+            print(file_path)
+        bat_path = r'C:\Users\%s\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup' % USER_NAME
+        with open(bat_path + '\\' + "todotkinter.bat", "w+") as bat_file:
+            bat_file.write(r'start "" "%s"' % file_path)
+    except Exception:
+        return
 
 
 def initialize_root(root):
@@ -160,7 +174,7 @@ def main():
             current_color_index_map[text_id] = (current_color_index_map[text_id] + 1) % 4
             root.after(100, lambda: cycle_colors(text_id))
 
-    mainline_textid = canvas.create_text(150, 100, text=mainlinetxt, font=bold_font, fill=text_color)
+    mainline_textid = canvas.create_text(150, 40, text=mainlinetxt, font=bold_font, fill=text_color)
     current_color_index_map[mainline_textid] = 0
     hovering_map[mainline_textid] = False
 
@@ -181,7 +195,10 @@ def main():
 
 
 if __name__ == "__main__":
-    next_y_position = 140
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+    USER_NAME = getpass.getuser()
+    add_to_startup()
+    next_y_position = 40 + 40
     transparent_color = "white"
     current_color_index_map = {}
     hovering_map = {}
