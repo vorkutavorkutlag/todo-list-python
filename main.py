@@ -183,7 +183,7 @@ def main():
     global taskboxdict
     keyboard.add_hotkey('ctrl + shift + l + k', root.destroy, args=())
     keyboard.add_hotkey('ctrl + shift + l + comma', toggle_visibility, args=())
-    keyboard.add_hotkey('ctrl + shift + l + c', lambda: complete_task(*tasks[0]) if tasks else None, args=())
+    keyboard.add_hotkey('ctrl + shift + l + [', lambda: complete_task(*tasks[0]) if tasks else None, args=())
     keyboard.add_hotkey('ctrl + shift + l + semicolon', on_click, args=())
 
     mainline_textid = canvas.create_text(150 + offsetx, 100 + offsety, text=mainlinetxt, font=bold_font, fill=text_color)
